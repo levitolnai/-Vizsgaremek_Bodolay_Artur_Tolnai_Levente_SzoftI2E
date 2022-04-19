@@ -1,6 +1,8 @@
 ﻿using eTicketsHEALTHWEB.Data;
 using eTicketsHEALTHWEB.Data.Services;
+using eTicketsHEALTHWEB.Data.Static;
 using eTicketsHEALTHWEB.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace eTicketsHEALTHWEB.Controllers
 {
+    [Authorize(Roles = UserRoles.Admin)]
     public class VirusNamesController : Controller
     {
         private readonly IVirusNamesService _service;
@@ -18,13 +21,15 @@ namespace eTicketsHEALTHWEB.Controllers
         {
             _service = service;
         }
+
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var allVirusNames = await _service.GetAllAsync(n => n.Hospital);
             return View(allVirusNames);
         }
 
-
+        [AllowAnonymous]
         public async Task<IActionResult> Filter(string searchString)
         {
             var allVirusNames = await _service.GetAllAsync(n => n.Hospital);
@@ -41,6 +46,7 @@ namespace eTicketsHEALTHWEB.Controllers
 
 
         //GET: VirusNames/Details/1
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
             var VirusNameDetail = await _service.GetVirusNameByIdAsync(id);

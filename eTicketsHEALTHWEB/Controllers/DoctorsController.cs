@@ -1,6 +1,8 @@
 ﻿using eTicketsHEALTHWEB.Data;
 using eTicketsHEALTHWEB.Data.Services;
+using eTicketsHEALTHWEB.Data.Static;
 using eTicketsHEALTHWEB.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -9,22 +11,26 @@ using System.Threading.Tasks;
 
 namespace eTicketsHEALTHWEB.Controllers
 {
+    [Authorize(Roles = UserRoles.Admin)]
     public class DoctorsController : Controller
     {
         private readonly IDoctorsService _service;
-        private int id;
+        public int id;
+
 
         public DoctorsController(IDoctorsService service)
         {
             _service = service;
         }
+
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var data = await _service.GetAllAsync();
             return View(data);
         }
 
-        //Get: Doctors/Create - well no data manipulation don"t need async Task
+        //Get: Doctors/Create
         public IActionResult Create()
         {
             return View();
@@ -40,7 +46,7 @@ namespace eTicketsHEALTHWEB.Controllers
             return RedirectToAction(nameof(Index));
         }
         //Get: Doctors/Details/1
-
+        [AllowAnonymous]
         public async Task<IActionResult> Details (int id)
         {
             var doctorDetails = await _service.GetByIdAsync(id);

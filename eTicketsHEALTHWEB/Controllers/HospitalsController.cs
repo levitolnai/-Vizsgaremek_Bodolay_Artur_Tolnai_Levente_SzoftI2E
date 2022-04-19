@@ -1,6 +1,8 @@
 ﻿using eTicketsHEALTHWEB.Data;
 using eTicketsHEALTHWEB.Data.Services;
+using eTicketsHEALTHWEB.Data.Static;
 using eTicketsHEALTHWEB.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace eTicketsHEALTHWEB.Controllers
 {
+    [Authorize(Roles = UserRoles.Admin)]
     public class HospitalsController : Controller
     {
         private readonly IHospitalsService _service;
@@ -17,6 +20,8 @@ namespace eTicketsHEALTHWEB.Controllers
         {
             _service = service;
         }
+
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var allHospitals = await _service.GetAllAsync();
@@ -41,7 +46,7 @@ namespace eTicketsHEALTHWEB.Controllers
         }
 
         //Get: Details
-
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
             var hospitalDetails = await _service.GetByIdAsync(id);

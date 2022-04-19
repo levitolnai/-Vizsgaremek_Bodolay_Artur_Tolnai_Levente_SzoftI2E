@@ -1,8 +1,13 @@
 using eTicketsHEALTHWEB.Data;
+using eTicketsHEALTHWEB.Data.Cart;
 using eTicketsHEALTHWEB.Data.Services;
+using eTicketsHEALTHWEB.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +41,19 @@ namespace eTicketsHEALTHWEB
             services.AddScoped<ICompaniesService, CompaniesService>(); //steps: INTERFACE -(at base model EntityBase) +Class Service - Startup.cs 
             services.AddScoped<IHospitalsService, HospitalsService>(); //steps: INTERFACE -(at base model EntityBase) +Class Service - Startup.cs 
             services.AddScoped<IVirusNamesService, VirusNamesService>();
+            services.AddScoped<IOrdersService, OrdersService>();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped(sc => ShoppingCart.GetShoppingCart(sc));
+
+            //Authetication and authorization
+            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
+            services.AddMemoryCache();
+            services.AddSession();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            });
 
             services.AddControllersWithViews();
         }
@@ -58,6 +76,11 @@ namespace eTicketsHEALTHWEB
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseSession();
+
+            //Authentication and Authorization
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseAuthorization();
 
@@ -65,10 +88,11 @@ namespace eTicketsHEALTHWEB
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=VirusNames}/{action=Index}/{id?}");
             });
-            //Seed database*see Data/AppDdbInitializer.cs
+            //Seed database
             AppDbInitializer.Seed(app);
+            AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
         }
     }
 }

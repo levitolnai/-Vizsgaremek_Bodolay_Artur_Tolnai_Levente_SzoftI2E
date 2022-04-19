@@ -1,9 +1,10 @@
 ﻿using eTicketsHEALTHWEB.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace eTicketsHEALTHWEB.Data
 {
-    public class AppDbContext: DbContext//Translator between your Model Classes and Database
+    public class AppDbContext: IdentityDbContext<ApplicationUser> //Translator between your Model Classes and Database
     {
         public AppDbContext(DbContextOptions<AppDbContext>options):base(options)
         {
@@ -32,6 +33,10 @@ namespace eTicketsHEALTHWEB.Data
         public DbSet<Hospital> Hospitals { get; set; }
         public DbSet<Company> Companys { get; set; }
 
-
+        //Orders related tables
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
+        
     }
 }
